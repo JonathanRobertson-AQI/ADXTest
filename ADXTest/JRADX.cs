@@ -16,13 +16,13 @@ namespace ADXTest
         {
             JREvent model = new JREvent
             {
-                ID = 1,
+                ID = 3,
                 Name = "Test"
             };
 
             string json = JsonConvert.SerializeObject(model);
 
-            await Ingest(json, "redacted", "JR", "JREvents");
+            await Ingest(json, "https://ingest-oneadxfeature.eastus.kusto.windows.net", "JR", "JREvents");
         }
 
 
@@ -30,7 +30,13 @@ namespace ADXTest
         {
             // WithAadUserPromptAuthentication() prompts to login...
             // easy for proof of concept
-            KustoConnectionStringBuilder kustoConnectionStringBuilder = new KustoConnectionStringBuilder(ingestUri).WithAadUserPromptAuthentication();
+            //KustoConnectionStringBuilder kustoConnectionStringBuilder = new KustoConnectionStringBuilder(ingestUri).WithAadUserPromptAuthentication();
+
+            string applicationId = "redacted";
+            string password = "redacted";
+            string tenant = "redacted";
+            KustoConnectionStringBuilder kustoConnectionStringBuilder = new KustoConnectionStringBuilder(ingestUri).WithAadApplicationKeyAuthentication(applicationId, password, tenant);
+
 
             byte[] payloadBytes = Encoding.ASCII.GetBytes(jsonPayload);
             MemoryStream byteStream = new MemoryStream(payloadBytes);
@@ -53,7 +59,6 @@ namespace ADXTest
                 Format = DataSourceFormat.multijson
             };
             props.AdditionalProperties.Add("OperationTimeoutMs", "60000");
-
 
             try
             {
